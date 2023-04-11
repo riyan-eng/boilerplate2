@@ -1,0 +1,4 @@
+- dao (data access object)
+- dto (data transfer object)
+- dso (data structure object)
+- dro (data response object)
