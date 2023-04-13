@@ -19,9 +19,10 @@ func NewRouter(app *fiber.App) {
 	// service
 	authorService := service.NewAuthorService(dao)
 	bookService := service.NewBookService(dao)
+	authenticationService := service.NewAuthenticationService(dao)
 
 	// handler
-	handler := handler.NewMicroService(authorService, bookService)
+	handler := handler.NewMicroService(authorService, bookService, authenticationService)
 
 	// grouping router
 	authorGroup := app.Group("/author")

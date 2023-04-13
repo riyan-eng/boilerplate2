@@ -26,8 +26,8 @@ type CachedTokens struct {
 	RefreshUID string `json:"refresh"`
 }
 
-func GenerateJWT(issuer string, userID string, companyID string, autoLogoffMinutes int) (string, string, error) {
-	accessToken, accessUID, _, _ := createToken(issuer, 30, userID, companyID, "AllYourBaseAccess")
+func GenerateJWT(issuer string, userID string, companyID string, autoLogoffMinutes int) (string, string, int64, error) {
+	accessToken, accessUID, expiredAt, _ := createToken(issuer, 30, userID, companyID, "AllYourBaseAccess")
 	refreshToken, refreshUID, _, _ := createToken(issuer, 60, userID, companyID, "AllYourBaseRefresh")
 	cacheJSON, err := json.Marshal(CachedTokens{
 		AccessUID:  accessUID,
@@ -36,7 +36,7 @@ func GenerateJWT(issuer string, userID string, companyID string, autoLogoffMinut
 
 	ctx := context.Background()
 	config.Redis.Set(ctx, fmt.Sprintf("token-%s", userID), string(cacheJSON), time.Minute*time.Duration(autoLogoffMinutes))
-	return accessToken, refreshToken, err
+	return accessToken, refreshToken, expiredAt, err
 }
 
 func createToken(issuer string, expireMinutes int, userID string, companyID string, secret string) (t string, uid string, exp int64, err error) {

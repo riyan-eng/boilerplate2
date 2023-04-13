@@ -2,6 +2,8 @@ package main
 
 import (
 	"boilerplate/cmd/router"
+	"boilerplate/config"
+	"boilerplate/migration"
 	"runtime"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,9 +16,9 @@ func init() {
 	} else {
 		runtime.GOMAXPROCS(numCPU / 2)
 	}
-	// config.ConnDatabase()
-	// migration.Start()
-	// config.ConnRedis()
+	config.ConnDatabase()
+	migration.Start()
+	config.ConnRedis()
 }
 
 func main() {

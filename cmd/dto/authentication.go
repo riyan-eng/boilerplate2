@@ -6,3 +6,8 @@ type RegisterAdmin struct {
 	PhoneNumber string
 	Password    string
 }
+
+type Login struct {
+	UserName string
+	Password string
+}

@@ -8,4 +8,5 @@ import (
 
 func authenticationRouter(router fiber.Router, handler *handler.MicroServiceServer) {
 	router.Post("/register_admin", handler.RegisterAdmin)
+	router.Post("/login", handler.Login)
 }

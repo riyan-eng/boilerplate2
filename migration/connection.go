@@ -47,9 +47,15 @@ func Start() {
 		database.Create(userTypes)
 	}
 	//
+	if err := database.First(&UserDatas{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		userData := []UserDatas{
+			{ID: "e1aa18e1-3400-45cb-a883-7394d87f2abd", Name: "nama saya sebenarnya ada 2"},
+		}
+		database.Create(userData)
+	}
 	if err := database.First(&Users{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		users := []Users{
-			{UserTypeCode: "super_admin", UserName: "admin ganteng", Email: "adminganteng@mail.com", Password: "$2a$10$nEr9y50xz8oMQQaAzAjDaOif4/75XyH8DCQ1WqtZ.bYyNUEkC28aK"},
+			{UserDataID: "e1aa18e1-3400-45cb-a883-7394d87f2abd", UserTypeCode: "super_admin", UserName: "admin ganteng", Email: "adminganteng@mail.com", Password: "$2a$10$nEr9y50xz8oMQQaAzAjDaOif4/75XyH8DCQ1WqtZ.bYyNUEkC28aK"},
 		}
 		database.Create(users)
 	}

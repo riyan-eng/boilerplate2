@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/Blank-Xu/sql-adapter v0.0.0-20210714092925-0bdd0d548758
+	github.com/blockloop/scan/v2 v2.0.1
 	github.com/casbin/casbin/v2 v2.66.3
 	github.com/go-playground/validator/v10 v10.12.0
 	github.com/gofiber/fiber/v2 v2.43.0

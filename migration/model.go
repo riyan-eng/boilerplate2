@@ -26,15 +26,15 @@ type Users struct {
 	UserName     string    `gorm:"column:username; unique"`
 	UserTypeCode string    `gorm:"column:user_type_code"`
 	UserType     UserTypes `gorm:"foreignKey:UserTypeCode;references:code;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Email        string    `gorm:"column:email"`
+	Email        string    `gorm:"column:email; unique"`
 	Password     string    `gorm:"column:password"`
 	Pin          string    `gorm:"column:pin"`
-	PhoneNumber  string    `gorm:"column:phone_number"`
-	UserDataID   string    `gorm:"column:user_data_id"`
+	PhoneNumber  string    `gorm:"column:phone_number; unique"`
+	UserDataID   string    `gorm:"column:user_data_id; unique"`
 	UserData     UserDatas `gorm:"foreignKey:UserDataID;references:id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	IsActive     bool      `gorm:"column:is_active; default:true"`
 	CreatedAt    time.Time `gorm:"autoCreateTime; default:current_timestamp"`
 	UpdatedAt    time.Time `gorm:"autoCreateTime; default:current_timestamp"`
-	CreatedByID  string    `gorm:"column:created_by"`
+	CreatedByID  string    `gorm:"column:created_by; default:null"`
 	CreatedBy    *Users    `gorm:"foreignKey:CreatedByID;references:id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

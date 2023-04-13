@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"boilerplate/cmd/dto"
 	handlerReqres "boilerplate/cmd/handler/reqres"
+	serviceReqres "boilerplate/cmd/service/reqres"
 	"boilerplate/pkg"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,7 +23,22 @@ func (m *MicroServiceServer) RegisterAdmin(c *fiber.Ctx) error {
 			Message: "bad",
 		})
 	}
-	fmt.Println(payload)
+	serviceReq := serviceReqres.RegisterAdminRequest{
+		Context: c.Context(),
+		Item: dto.RegisterAdmin{
+			UserName:    payload.UserName,
+			Password:    payload.Password,
+			Email:       payload.Email,
+			PhoneNumber: payload.PhoneNumber,
+		},
+	}
+	serviceRes := m.authenticationService.RegisterAdmin(&serviceReq)
+	if serviceRes.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(pkg.ResponseJson{
+			Data:    serviceRes.Error.Error(),
+			Message: "bad",
+		})
+	}
 	return c.JSON(pkg.ResponseJson{
 		Data:    "successfully insert data",
 		Message: "ok",

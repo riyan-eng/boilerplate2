@@ -6,3 +6,8 @@ type RegisterAdminRequest struct {
 	PhoneNumber string `json:"phone_number" validate:"required"`
 	Password    string `json:"password" validate:"required"`
 }
+
+type LoginRequest struct {
+	UserName string `json:"user_name" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}

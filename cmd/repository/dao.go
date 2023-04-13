@@ -5,6 +5,7 @@ import "database/sql"
 type DAO interface {
 	NewAuthorQuery() AuthorQuery
 	NewBookQuery() BookQuery
+	NewAuthenticationQuery() AuthenticationQuery
 }
 
 type dao struct {
@@ -25,4 +26,10 @@ func (d *dao) NewAuthorQuery() AuthorQuery {
 
 func (d *dao) NewBookQuery() BookQuery {
 	return &bookQuery{}
+}
+
+func (d *dao) NewAuthenticationQuery() AuthenticationQuery {
+	return &authenticationQuery{
+		database: d.dbpostgre,
+	}
 }
