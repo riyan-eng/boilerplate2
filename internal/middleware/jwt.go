@@ -30,7 +30,7 @@ func AuthorizeJwt() fiber.Handler {
 			})
 		}
 		tokenString := splitToken[1]
-		claims, err := util.ParseToken(tokenString, "AllYourBaseAccess")
+		claims, err := util.ParseToken(tokenString, config.GetEnv("JWT_SECRET_ACCESS"))
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				// Malformed token -> Delete Cookie

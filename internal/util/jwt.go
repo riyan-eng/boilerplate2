@@ -27,8 +27,8 @@ type CachedTokens struct {
 }
 
 func GenerateJWT(issuer string, userID string, companyID string, autoLogoffMinutes int) (string, string, int64, error) {
-	accessToken, accessUID, expiredAt, _ := createToken(issuer, 30, userID, companyID, "AllYourBaseAccess")
-	refreshToken, refreshUID, _, _ := createToken(issuer, 60, userID, companyID, "AllYourBaseRefresh")
+	accessToken, accessUID, expiredAt, _ := createToken(issuer, 30, userID, companyID, config.GetEnv("JWT_SECRET_ACCESS"))
+	refreshToken, refreshUID, _, _ := createToken(issuer, 60, userID, companyID, config.GetEnv("JWT_SECRET_REFRESH"))
 	cacheJSON, err := json.Marshal(CachedTokens{
 		AccessUID:  accessUID,
 		RefreshUID: refreshUID,

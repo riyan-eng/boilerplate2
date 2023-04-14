@@ -95,7 +95,7 @@ func (a *authenticationService) Logout(serviceReq *serviceReqres.LogoutRequest) 
 }
 
 func (a *authenticationService) RefreshToken(serviceReq *serviceReqres.RefreshTokenRequest) (serviceRes serviceReqres.RefreshTokenResponse) {
-	claims, err := util.ParseToken(serviceReq.RefreshToken, "AllYourBaseRefresh")
+	claims, err := util.ParseToken(serviceReq.RefreshToken, config.GetEnv("JWT_SECRET_REFRESH"))
 	if err != nil {
 		log.Println(err.Error())
 		serviceRes.Error = errors.New(pkg.ERROR_REQUEST)

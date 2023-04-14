@@ -1,9 +1,11 @@
 package migration
 
 import (
+	"boilerplate/config"
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -11,7 +13,10 @@ import (
 )
 
 func Start() {
-	dsn := "host=localhost user=postgres password=riyan dbname=boilerplate2 port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	// "host=localhost user=postgres password=riyan dbname=boilerplate2 port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	dsn := fmt.Sprintf(
+		`host='%v' user='%v' password='%v' dbname='%v' port='%v' sslmode=disable TimeZone=%s`,
+		config.GetEnv("DB_HOST"), config.GetEnv("DB_USERNAME"), config.GetEnv("DB_PASSWORD"), config.GetEnv("DB_NAME"), config.GetEnv("DB_PORT"), config.GetEnv("TIME_ZONE"))
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
@@ -21,9 +26,12 @@ func Start() {
 	}
 
 	sqlDB, _ := database.DB()
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
+	maxIdleConns, _ := strconv.Atoi(config.GetEnv("DB_MAX_IDDLE_CONN"))
+	maxOpenConns, _ := strconv.Atoi(config.GetEnv("DB_MAX_OPEN_CONN"))
+	connMaxLifetime, _ := strconv.Atoi(config.GetEnv("DB_CONN_MAX_LIFETIME_HOUR"))
+	sqlDB.SetMaxIdleConns(maxIdleConns)
+	sqlDB.SetMaxOpenConns(maxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Hour * time.Duration(connMaxLifetime))
 	if err := sqlDB.Ping(); err != nil {
 		log.Fatal("migration: can't ping to database")
 	}

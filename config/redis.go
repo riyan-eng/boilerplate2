@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -11,11 +12,12 @@ import (
 var Redis *redis.Client
 
 func ConnRedis() {
-	addr := fmt.Sprintf("%s:%s", "localhost", "6379")
+	addr := fmt.Sprintf("%s:%s", GetEnv("REDIS_HOST"), GetEnv("REDIS_PORT"))
+	redisDB, _ := strconv.Atoi(GetEnv("REDIS_DB"))
 	Redis = redis.NewClient(&redis.Options{
 		Addr:     addr,
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Password: GetEnv("REDIS_PASSWORD"),
+		DB:       redisDB,
 	})
 	ctx := context.Background()
 	if err := Redis.Ping(ctx).Err(); err != nil {
