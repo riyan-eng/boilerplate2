@@ -24,11 +24,14 @@ func NewRouter(app *fiber.App) {
 	// handler
 	handler := handler.NewMicroService(authorService, bookService, authenticationService)
 
+	// enforce
+	enforcer := config.Casbin()
+
 	// grouping router
 	authorGroup := app.Group("/author")
 	authorRouter(authorGroup, handler)
 
 	// grouping authentication
 	authenticationGroup := app.Group("/auth")
-	authenticationRouter(authenticationGroup, handler)
+	authenticationRouter(authenticationGroup, handler, enforcer)
 }

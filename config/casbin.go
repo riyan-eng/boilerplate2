@@ -18,12 +18,12 @@ func Casbin() *casbin.Enforcer {
 		panic(fmt.Sprintf("failed to create casbin enforcer: %v", err))
 	}
 
-	if hasPolicy := enforce.HasPolicy("admin", "/api/admin/*", "(GET)|(POST)|(PUT)|(DELETE)"); !hasPolicy {
-		enforce.AddPolicy("admin", "/api/admin/*", "(GET)|(POST)|(PUT)|(DELETE)")
+	if hasPolicy := enforce.HasPolicy("super_admin", "/auth/register_admin/*", "(GET)|(POST)|(PUT)|(DELETE)"); !hasPolicy {
+		enforce.AddPolicy("super_admin", "/auth/register_admin/*", "(GET)|(POST)|(PUT)|(DELETE)")
 	}
-	if hasPolicy := enforce.HasPolicy("user", "/api/users/:id/*", "(GET)|(PUT)"); !hasPolicy {
-		enforce.AddPolicy("user", "/api/users/:id/*", "(GET)|(PUT)")
-	}
+	// if hasPolicy := enforce.HasPolicy("user", "/api/users/:id/*", "(GET)|(PUT)"); !hasPolicy {
+	// 	enforce.AddPolicy("user", "/api/users/:id/*", "(GET)|(PUT)")
+	// }
 	enforce.LoadPolicy()
 	return enforce
 }

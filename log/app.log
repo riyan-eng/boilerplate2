@@ -169,3 +169,30 @@
 2023/04/14 12:59:16 token not found
 2023/04/14 12:59:15 401 - POST /auth/refresh
 2023/04/14 12:59:21 200 - POST /auth/refresh
+2023/04/14 13:20:54 200 - POST /auth/login
+2023/04/14 13:21:08 403 - POST /auth/register_admin
+2023/04/14 13:25:53 403 - POST /auth/register_admin
+2023/04/14 13:26:21 200 - POST /auth/login
+2023/04/14 13:26:57 200 - POST /auth/login
+2023/04/14 13:27:20 200 - POST /auth/login
+2023/04/14 13:27:37 403 - POST /auth/register_admin
+2023/04/14 13:27:42 403 - POST /auth/register_admin
+2023/04/14 13:30:14 403 - POST /auth/register_admin
+2023/04/14 13:30:41 403 - POST /auth/register_admin
+2023/04/14 13:31:12 403 - POST /auth/register_admin
+2023/04/14 13:32:24 403 - POST /auth/register_admin
+2023/04/14 13:33:04 403 - POST /auth/register_admin
+2023/04/14 13:33:18 pq: duplicate key value violates unique constraint "users_username_key"
+2023/04/14 13:33:17 409 - POST /auth/register_admin/
+2023/04/14 13:33:46 403 - POST /auth/register_admin/
+2023/04/14 13:33:49 pq: duplicate key value violates unique constraint "users_username_key"
+2023/04/14 13:33:49 409 - POST /auth/register_admin
+2023/04/14 13:34:41 pq: duplicate key value violates unique constraint "users_username_key"
+2023/04/14 13:34:40 409 - POST /auth/register_admin
+2023/04/14 13:34:52 pq: duplicate key value violates unique constraint "users_email_key"
+2023/04/14 13:34:51 409 - POST /auth/register_admin
+2023/04/14 13:35:00 pq: duplicate key value violates unique constraint "users_phone_number_key"
+2023/04/14 13:34:59 409 - POST /auth/register_admin
+2023/04/14 13:35:04 200 - POST /auth/register_admin
+2023/04/14 13:35:22 200 - POST /auth/login
+2023/04/14 13:35:35 403 - POST /auth/register_admin

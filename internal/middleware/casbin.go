@@ -14,15 +14,15 @@ func AuthorizeCasbin(enforce *casbin.Enforcer) fiber.Handler {
 		if userID == "" || !ok {
 			return c.Status(fiber.StatusUnauthorized).JSON(pkg.ResponseJson{
 				Data:    "current logged in user not found",
-				Message: "unauthorized",
+				Message: pkg.MESSAGE_UNAUTHORIZED,
 			})
 		}
 
 		// load policy
 		if err := enforce.LoadPolicy(); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(pkg.ResponseJson{
-				Data:    "failed to load casbin policy",
-				Message: "bad",
+				Data:    "failed to load casbin policy.",
+				Message: pkg.MESSAGE_BAD_SYSTEM,
 			})
 		}
 
@@ -30,13 +30,13 @@ func AuthorizeCasbin(enforce *casbin.Enforcer) fiber.Handler {
 		accepted, err := enforce.Enforce(userID, c.OriginalURL(), c.Method()) // userID - url - method
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(pkg.ResponseJson{
-				Data:    "error when authorizing user's accessibility",
-				Message: "bad",
+				Data:    "error when authorizing user's accessibility.",
+				Message: pkg.MESSAGE_BAD_SYSTEM,
 			})
 		}
 		if !accepted {
 			return c.Status(fiber.StatusForbidden).JSON(pkg.ResponseJson{
-				Message: "unauthorized",
+				Message: "you're not allowed.",
 			})
 		}
 		return c.Next()
