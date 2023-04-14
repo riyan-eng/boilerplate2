@@ -7,6 +7,7 @@ import (
 	"boilerplate/pkg"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/lib/pq"
 )
 
 func (m *MicroServiceServer) RegisterAdmin(c *fiber.Ctx) error {
@@ -14,13 +15,13 @@ func (m *MicroServiceServer) RegisterAdmin(c *fiber.Ctx) error {
 	if err := c.BodyParser(&payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(pkg.ResponseJson{
 			Data:    err.Error(),
-			Message: "bad",
+			Message: pkg.MESSAGE_BAD_REQUEST,
 		})
 	}
 	if err := pkg.Validate(payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(pkg.ResponseJson{
 			Data:    err,
-			Message: "bad",
+			Message: pkg.MESSAGE_BAD_REQUEST,
 		})
 	}
 	serviceReq := serviceReqres.RegisterAdminRequest{
@@ -34,13 +35,18 @@ func (m *MicroServiceServer) RegisterAdmin(c *fiber.Ctx) error {
 	}
 	serviceRes := m.authenticationService.RegisterAdmin(&serviceReq)
 	if serviceRes.Error != nil {
+		if serviceRes.Error.(*pq.Error).Code.Name() == "unique_violation" {
+			return c.Status(fiber.StatusConflict).JSON(pkg.ResponseJson{
+				Data:    pkg.PqErrGenerate(serviceRes.Error),
+				Message: pkg.MESSAGE_BAD_REQUEST,
+			})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(pkg.ResponseJson{
 			Data:    serviceRes.Error.Error(),
-			Message: "bad",
+			Message: pkg.MESSAGE_BAD_SYSTEM,
 		})
 	}
 	return c.JSON(pkg.ResponseJson{
-		Data:    "successfully insert data",
-		Message: "ok",
+		Message: pkg.MESSAGE_OK_CREATE,
 	})
 }

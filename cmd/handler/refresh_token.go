@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"boilerplate/cmd/dto"
 	handlerReqres "boilerplate/cmd/handler/reqres"
 	serviceReqres "boilerplate/cmd/service/reqres"
 	"boilerplate/pkg"
@@ -9,8 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func (m *MicroServiceServer) Login(c *fiber.Ctx) error {
-	payload := new(handlerReqres.LoginRequest)
+func (m *MicroServiceServer) RefreshToken(c *fiber.Ctx) error {
+	payload := new(handlerReqres.RefreshTokenRequest)
 	if err := c.BodyParser(&payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(pkg.ResponseJson{
 			Data:    err.Error(),
@@ -23,33 +22,30 @@ func (m *MicroServiceServer) Login(c *fiber.Ctx) error {
 			Message: pkg.MESSAGE_BAD_REQUEST,
 		})
 	}
-	serviceReq := serviceReqres.LoginRequest{
-		Context: c.Context(),
-		Issuer:  string(c.Request().Host()),
-		Item: dto.Login{
-			UserName: payload.UserName,
-			Password: payload.Password,
-		},
+	serviceReq := serviceReqres.RefreshTokenRequest{
+		Context:      c.Context(),
+		RefreshToken: payload.RefreshToken,
+		Issuer:       string(c.Request().Host()),
 	}
-	serviceRes := m.authenticationService.Login(&serviceReq)
+	serviceRes := m.authenticationService.RefreshToken(&serviceReq)
 	if serviceRes.Error != nil {
+		if serviceRes.Error.Error() == pkg.ERROR_REQUEST {
+			return c.Status(fiber.StatusUnauthorized).JSON(pkg.ResponseJson{
+				Message: pkg.MESSAGE_UNAUTHORIZED,
+			})
+		}
 		return c.Status(fiber.StatusBadRequest).JSON(pkg.ResponseJson{
 			Data:    serviceRes.Error.Error(),
 			Message: pkg.MESSAGE_BAD_SYSTEM,
 		})
 	}
-	handleRes := handlerReqres.LoginResponse{
+	handlerRes := handlerReqres.RefreshTokenResponse{
 		AccessToken:  serviceRes.AccessToken,
 		RefreshToken: serviceRes.RefreshToken,
 		ExpiredAt:    serviceRes.ExpiredAt,
-		UserName:     serviceRes.Item.UserName,
-		UserTypeName: serviceRes.Item.UserTypeName,
-		Name:         serviceRes.Item.Name,
-		Email:        serviceRes.Item.Email,
-		PhoneNumber:  serviceRes.Item.PhoneNumber,
 	}
 	return c.JSON(pkg.ResponseJson{
-		Data:    handleRes,
-		Message: "successfully login.",
+		Data:    handlerRes,
+		Message: "successfully refresh.",
 	})
 }

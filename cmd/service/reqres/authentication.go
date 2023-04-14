@@ -38,3 +38,16 @@ type LogoutRequest struct {
 type LogoutResponse struct {
 	Error error
 }
+
+type RefreshTokenRequest struct {
+	Context      *fasthttp.RequestCtx
+	RefreshToken string
+	Issuer       string
+}
+
+type RefreshTokenResponse struct {
+	AccessToken  string
+	RefreshToken string
+	ExpiredAt    int64
+	Error        error
+}

@@ -16,11 +16,10 @@ func (m *MicroServiceServer) Logout(c *fiber.Ctx) error {
 	if serviceRes.Error != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(pkg.ResponseJson{
 			Data:    serviceRes.Error.Error(),
-			Message: "bad",
+			Message: pkg.MESSAGE_BAD_SYSTEM,
 		})
 	}
 	return c.JSON(pkg.ResponseJson{
-		Data:    "successfully logout",
-		Message: "ok",
+		Message: "successfully logout.",
 	})
 }

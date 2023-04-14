@@ -18,6 +18,7 @@ type AuthenticationService interface {
 	RegisterAdmin(*serviceReqres.RegisterAdminRequest) serviceReqres.RegisterAdminResponse
 	Login(*serviceReqres.LoginRequest) serviceReqres.LoginResponse
 	Logout(*serviceReqres.LogoutRequest) serviceReqres.LogoutResponse
+	RefreshToken(*serviceReqres.RefreshTokenRequest) serviceReqres.RefreshTokenResponse
 }
 
 type authenticationService struct {
@@ -46,8 +47,8 @@ func (a *authenticationService) RegisterAdmin(serviceReq *serviceReqres.Register
 	}
 	repoRes := a.dao.NewAuthenticationQuery().RegisterAdmin(&repoReq)
 	if repoRes.Error != nil {
-		log.Print(repoRes.Error.Error())
-		serviceRes.Error = errors.New(pkg.PqErrGenerate(repoRes.Error))
+		log.Println(repoRes.Error.Error())
+		serviceRes.Error = repoRes.Error
 		return
 	}
 	return
@@ -62,7 +63,7 @@ func (a *authenticationService) Login(serviceReq *serviceReqres.LoginRequest) (s
 	}
 	repoRes := a.dao.NewAuthenticationQuery().Login(&repoReq)
 	if repoRes.Error == sql.ErrNoRows {
-		log.Print(repoRes.Error.Error())
+		log.Println(repoRes.Error.Error())
 		serviceRes.Error = errors.New("username doesn't exist")
 		return
 	}
@@ -72,7 +73,7 @@ func (a *authenticationService) Login(serviceReq *serviceReqres.LoginRequest) (s
 	}
 	accessToken, refreshToken, expiredAt, err := util.GenerateJWT(serviceReq.Issuer, repoRes.Item.ID, "", 45)
 	if err != nil {
-		log.Print(err.Error())
+		log.Println(err.Error())
 		serviceRes.Error = errors.New("error generate token")
 		return
 	}
@@ -86,9 +87,33 @@ func (a *authenticationService) Login(serviceReq *serviceReqres.LoginRequest) (s
 func (a *authenticationService) Logout(serviceReq *serviceReqres.LogoutRequest) (serviceRes serviceReqres.LogoutResponse) {
 	err := config.Redis.Del(serviceReq.Context, fmt.Sprintf("token-%s", serviceReq.UserID)).Err()
 	if err != nil {
-		log.Print(err.Error())
+		log.Println(err.Error())
 		serviceRes.Error = errors.New("internal server error")
 		return
 	}
+	return
+}
+
+func (a *authenticationService) RefreshToken(serviceReq *serviceReqres.RefreshTokenRequest) (serviceRes serviceReqres.RefreshTokenResponse) {
+	claims, err := util.ParseToken(serviceReq.RefreshToken, "AllYourBaseRefresh")
+	if err != nil {
+		log.Println(err.Error())
+		serviceRes.Error = errors.New(pkg.ERROR_REQUEST)
+		return
+	}
+	if err := util.ValidateToken(claims, true, serviceReq.Context); err != nil {
+		log.Println(err.Error())
+		serviceRes.Error = errors.New(pkg.ERROR_REQUEST)
+		return
+	}
+	accessToken, refreshToken, expiredAt, err := util.GenerateJWT(serviceReq.Issuer, claims.UserID, "", 45)
+	if err != nil {
+		log.Println(err.Error())
+		serviceRes.Error = errors.New("error generate token")
+		return
+	}
+	serviceRes.AccessToken = accessToken
+	serviceRes.RefreshToken = refreshToken
+	serviceRes.ExpiredAt = expiredAt
 	return
 }

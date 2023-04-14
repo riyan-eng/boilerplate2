@@ -74,7 +74,6 @@ func ValidateToken(claims *CustomClaims, isRefresh bool, ctx *fasthttp.RequestCt
 		cacheJSON, _ := config.Redis.Get(ctx, fmt.Sprintf("token-%s", claims.UserID)).Result()
 		cachedTokens := new(CachedTokens)
 		err := json.Unmarshal([]byte(cacheJSON), cachedTokens)
-
 		var tokenUID string
 		if isRefresh {
 			tokenUID = cachedTokens.RefreshUID

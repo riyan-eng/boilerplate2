@@ -59,7 +59,7 @@ func (a *authenticationQuery) Login(repoReq *reqres.LoginRequest) (repoRes reqre
 	q := fmt.Sprintf(`
 	select u.id, u.username, u.email, u."password", coalesce(u.phone_number, '') as phone_number , ut.code as user_type_code, ut."name" as user_type_name, coalesce(ud."name", '') as name 
 	from users u left join user_types ut on u.user_type_code = ut.code left join user_datas ud on u.user_data_id = ud.id where u.username = '%v' or u.email = '%v'
-	`, repoReq.Item.UserName, repoReq.Item.Email)
+	`, repoReq.Item.UserName, repoReq.Item.UserName)
 	row, err := a.database.QueryContext(repoReq.Context, q)
 	if err != nil {
 		repoRes.Error = err
