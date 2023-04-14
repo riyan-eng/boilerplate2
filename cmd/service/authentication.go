@@ -5,15 +5,19 @@ import (
 	"boilerplate/cmd/repository"
 	repoReqres "boilerplate/cmd/repository/reqres"
 	serviceReqres "boilerplate/cmd/service/reqres"
+	"boilerplate/config"
 	"boilerplate/internal/util"
 	"boilerplate/pkg"
 	"database/sql"
 	"errors"
+	"fmt"
+	"log"
 )
 
 type AuthenticationService interface {
 	RegisterAdmin(*serviceReqres.RegisterAdminRequest) serviceReqres.RegisterAdminResponse
 	Login(*serviceReqres.LoginRequest) serviceReqres.LoginResponse
+	Logout(*serviceReqres.LogoutRequest) serviceReqres.LogoutResponse
 }
 
 type authenticationService struct {
@@ -42,6 +46,7 @@ func (a *authenticationService) RegisterAdmin(serviceReq *serviceReqres.Register
 	}
 	repoRes := a.dao.NewAuthenticationQuery().RegisterAdmin(&repoReq)
 	if repoRes.Error != nil {
+		log.Print(repoRes.Error.Error())
 		serviceRes.Error = errors.New(pkg.PqErrGenerate(repoRes.Error))
 		return
 	}
@@ -57,6 +62,7 @@ func (a *authenticationService) Login(serviceReq *serviceReqres.LoginRequest) (s
 	}
 	repoRes := a.dao.NewAuthenticationQuery().Login(&repoReq)
 	if repoRes.Error == sql.ErrNoRows {
+		log.Print(repoRes.Error.Error())
 		serviceRes.Error = errors.New("username doesn't exist")
 		return
 	}
@@ -64,8 +70,9 @@ func (a *authenticationService) Login(serviceReq *serviceReqres.LoginRequest) (s
 		serviceRes.Error = errors.New("password didn't match")
 		return
 	}
-	accessToken, refreshToken, expiredAt, err := util.GenerateJWT(serviceReq.Issuer, repoReq.Item.ID, "", 45)
+	accessToken, refreshToken, expiredAt, err := util.GenerateJWT(serviceReq.Issuer, repoRes.Item.ID, "", 45)
 	if err != nil {
+		log.Print(err.Error())
 		serviceRes.Error = errors.New("error generate token")
 		return
 	}
@@ -73,5 +80,15 @@ func (a *authenticationService) Login(serviceReq *serviceReqres.LoginRequest) (s
 	serviceRes.RefreshToken = refreshToken
 	serviceRes.ExpiredAt = expiredAt
 	serviceRes.Item = repoRes.Item
+	return
+}
+
+func (a *authenticationService) Logout(serviceReq *serviceReqres.LogoutRequest) (serviceRes serviceReqres.LogoutResponse) {
+	err := config.Redis.Del(serviceReq.Context, fmt.Sprintf("token-%s", serviceReq.UserID)).Err()
+	if err != nil {
+		log.Print(err.Error())
+		serviceRes.Error = errors.New("internal server error")
+		return
+	}
 	return
 }

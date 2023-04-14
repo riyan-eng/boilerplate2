@@ -61,6 +61,9 @@ func ParseToken(tokenString string, secret string) (claims *CustomClaims, err er
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
+	if err != nil {
+		return
+	}
 	claims = token.Claims.(*CustomClaims)
 	return
 }

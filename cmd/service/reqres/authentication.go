@@ -29,3 +29,12 @@ type LoginResponse struct {
 	ExpiredAt    int64
 	Error        error
 }
+
+type LogoutRequest struct {
+	Context *fasthttp.RequestCtx
+	UserID  string
+}
+
+type LogoutResponse struct {
+	Error error
+}

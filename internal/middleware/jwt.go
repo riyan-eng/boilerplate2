@@ -3,6 +3,7 @@ package middleware
 import (
 	"boilerplate/config"
 	"boilerplate/internal/util"
+	"boilerplate/pkg"
 	"fmt"
 	"strings"
 	"time"
@@ -16,49 +17,48 @@ func AuthorizeJwt() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"data":    "authorization header is required",
-				"message": "bad",
+			return c.Status(fiber.StatusBadRequest).JSON(pkg.ResponseJson{
+				Data:    "authorization header is required",
+				Message: "bad",
 			})
 		}
 		splitToken := strings.Split(authHeader, " ")
 		if len(splitToken) != 2 {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"data":    "undefined token",
-				"message": "bad",
+			return c.Status(fiber.StatusBadRequest).JSON(pkg.ResponseJson{
+				Data:    "undefined token",
+				Message: "bad",
 			})
 		}
-
 		tokenString := splitToken[1]
 		claims, err := util.ParseToken(tokenString, "AllYourBaseAccess")
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				// Malformed token -> Delete Cookie
-				c.ClearCookie("jwt")
-				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-					"error":   true,
-					"message": "missing or malformed jwt!",
+				// c.ClearCookie("jwt")
+				return c.Status(fiber.StatusBadRequest).JSON(pkg.ResponseJson{
+					Data:    "missing or malformed jwt",
+					Message: "ok",
 				})
 			} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
 				// Token is either expired or not active yet
-				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-					"error":   true,
-					"message": "expired token!",
+				return c.Status(fiber.StatusUnauthorized).JSON(pkg.ResponseJson{
+					Data:    "expired token",
+					Message: "unauthorized",
 				})
 			} else {
 				// Cannot handle -> Delete Cookie
 				c.ClearCookie("jwt")
-				return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-					"error":   true,
-					"message": "error when processing identity!",
+				return c.Status(fiber.StatusForbidden).JSON(pkg.ResponseJson{
+					Data:    "error when processing identity",
+					Message: "forbidden",
 				})
 			}
 		}
 
 		if err := util.ValidateToken(claims, false, c.Context()); err != nil {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error":   true,
-				"message": "not authorized!",
+			return c.Status(fiber.StatusUnauthorized).JSON(pkg.ResponseJson{
+				Data:    "token not authorized",
+				Message: "unauthorized",
 			})
 		}
 		c.Locals("userID", claims.UserID)
