@@ -17,21 +17,15 @@ func NewRouter(app *fiber.App) {
 	dao := repository.NewDao(config.PostgreSQLDB)
 
 	// service
-	authorService := service.NewAuthorService(dao)
-	bookService := service.NewBookService(dao)
 	authenticationService := service.NewAuthenticationService(dao)
 
 	// handler
-	handler := handler.NewMicroService(authorService, bookService, authenticationService)
+	handler := handler.NewMicroService(authenticationService)
 
 	// enforce
 	enforcer := config.Casbin()
 
 	// grouping router
-	authorGroup := app.Group("/author")
-	authorRouter(authorGroup, handler)
-
-	// grouping authentication
 	authenticationGroup := app.Group("/auth")
 	authenticationRouter(authenticationGroup, handler, enforcer)
 }

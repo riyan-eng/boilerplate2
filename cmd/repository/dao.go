@@ -3,8 +3,6 @@ package repository
 import "database/sql"
 
 type DAO interface {
-	NewAuthorQuery() AuthorQuery
-	NewBookQuery() BookQuery
 	NewAuthenticationQuery() AuthenticationQuery
 }
 
@@ -16,16 +14,6 @@ func NewDao(dbpostgre *sql.DB) DAO {
 	return &dao{
 		dbpostgre: dbpostgre,
 	}
-}
-
-func (d *dao) NewAuthorQuery() AuthorQuery {
-	return &authorQuery{
-		database: d.dbpostgre,
-	}
-}
-
-func (d *dao) NewBookQuery() BookQuery {
-	return &bookQuery{}
 }
 
 func (d *dao) NewAuthenticationQuery() AuthenticationQuery {
